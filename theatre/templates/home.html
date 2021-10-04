@@ -11,14 +11,18 @@
         <div class="row">
             {% for movie in movies %}
             <div class="col-md-4" style="display: flex; justify-content: space-around;">
-                <div class="card m-3" style="width: 18rem; background-color: #84a14e; border-color: #84a14e;">
+                <div class="card m-3" style="width: 18rem; background-color: #119cbc; border-color: #119cbc;">
                     <img style="width: auto; height: 230px; overflow: hidden;"
-                    src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Mnx8fGVufDB8fHx8&w=1000&q=80" class="card-img-top" alt="...">
+                    src="{{ url_for('static', filename=movie.poster_path) }}" class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title" style="color: azure; height: 3.5rem;">{{ movie.title }}</h5>
-                        <p class="card-text" style="color: red;">{{ movie.year }}</p>
-                        <a href="{{ url_for('movie', id=movie.id) }}" class="btn"
-                            style="background-color: #00728f; color: #fff;">Watch Now</a>
+                        <p class="card-text" style="color: #fff;">{{ movie.year }}</p>
+                        {% if admin %}
+                            <a href="#" class="btn btn-success">Update</a>
+                        {% else %}
+                            <a href="{{ url_for('movie', id=movie.id) }}" class="btn btn-danger"
+                                >Watch Now</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

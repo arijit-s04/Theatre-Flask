@@ -1,3 +1,10 @@
 __pycache__
 theatre/static/**
 theatre/site.db
+!theatre/static/favicon.ico
+!theatre/static/main.css
+!theatre/static/default-poster.webp
+!theatre/static/script.js
+!theatre/static/form.js
+!theatre/static/cancel.png
+add_sample.py
