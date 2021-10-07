@@ -6,6 +6,7 @@ from theatre.forms import AdminLoginForm, ShowAddForm
 import ffmpeg
 from theatre import app
 from theatre.models import Movie
+from flask import session, abort
 
 
 def getVideoMetadata(video_path):
@@ -115,10 +116,12 @@ def retrieveKeyWords(query):
     return lst
 
 
-def checkCredentials(form:AdminLoginForm):
+def checkCredentialsAndLogin(form:AdminLoginForm):
     username = os.environ.get('USERNAME')
     password = os.environ.get('PASSWORD')
     if username == form.username.data and password == form.password.data:
+        session['admin'] = True
+        session.permanent = False
         return (True, 'Login Successful!')
     if username != form.username.data:
         return (False, 'Invalid username!')
@@ -133,3 +136,22 @@ def deleteShow(movie:Movie):
     except Exception as e:
         traceback.print_exc()
         return False
+
+
+def login_required(func):
+    def inner(*args, **kwargs):
+        if not isinstance(session.get('admin', None), bool):
+            abort(403)
+        return func(*args, **kwargs)
+    inner.__name__ = func.__name__
+    return inner
+
+
+def isAdmin():
+    if isinstance(session.get('admin', None), bool):
+        return True
+    return False
+
+
+def logoutUser():
+    session.pop('admin')

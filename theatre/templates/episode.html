@@ -22,7 +22,7 @@
             <strong>Frame rate: </strong>{{ metadata['frame_rate'] }}fps<br>
         </div>
     </div>
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end mt-2 mb-5">
         {% if episode > 1 %}
             <a href="{{ url_for('episode', id=movie.id, ep_no=episode-1) }}" class="btn btn-secondary">Previous</a>
         {% endif %}

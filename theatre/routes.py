@@ -1,7 +1,9 @@
-from flask import render_template, url_for, redirect, request, flash, session, abort
+from flask import render_template, url_for, redirect, request, flash, abort
 from . import app, db
 from .models import Movie
-from .utils import deleteShow, getVideoMetadata, saveForm, retrieveKeyWords, checkCredentials, saveFormSeries
+from .utils import (deleteShow, getVideoMetadata, isAdmin,\
+    login_required, saveForm, retrieveKeyWords,\
+    checkCredentialsAndLogin, saveFormSeries, logoutUser)
 from .forms import AdminLoginForm, ShowAddForm, ShowUpdateForm
 from sqlalchemy import or_
 
@@ -39,13 +41,11 @@ def episode(id, ep_no):
         abort(404)
     metadata = getVideoMetadata(f'{movie.path}/Ep_{ep_no}.mp4')
     return render_template('episode.html', metadata=metadata, movie=movie, episode=ep_no, episode_path=f'{movie.path}/Ep_{ep_no}.mp4')
-    return "<h1>Status 200 OK</h1>"
 
 
 @app.route('/admin/add_show/', methods=['GET', 'POST'])
+@login_required
 def add_show():
-    if not isinstance(session.get('admin', None), bool):
-        abort(403)
     form = ShowAddForm()
     series_files_check = None
     if form.category.data == 'series':
@@ -72,14 +72,12 @@ def add_show():
 
 @app.route('/admin/', methods=['GET', 'POST'])
 def admin():
-    if isinstance(session.get('admin', None), bool):
+    if isAdmin():
         return redirect(url_for('admin_home'))
     form = AdminLoginForm()
     if form.validate_on_submit():
-        result = checkCredentials(form)
-        session.permanent = False
+        result = checkCredentialsAndLogin(form)
         if result[0]:
-            session['admin'] = True
             flash(result[1], 'success')
             return redirect(url_for('admin_home'))
         flash(result[1], 'warning')
@@ -88,15 +86,14 @@ def admin():
 
 @app.route('/admin/logout/')
 def logout():
-    if isinstance(session.get('admin', None), bool):
-        session.pop('admin')
+    if isAdmin():
+        logoutUser()
     return redirect(url_for('home'))
 
 
 @app.route('/admin/home/')
+@login_required
 def admin_home():
-    if not isinstance(session.get('admin', None), bool):
-        abort(403)
     search_query = request.args.get('search', None, type=str)
     home_movies = None
     if search_query:
@@ -109,9 +106,8 @@ def admin_home():
 
 
 @app.route('/admin/update_show/<int:id>/', methods=['GET', 'POST'])
+@login_required
 def update_show(id):
-    if not isinstance(session.get('admin', None), bool):
-        abort(403)
     movie = Movie.query.get_or_404(id)
     form = ShowUpdateForm()
     if form.validate_on_submit():
@@ -137,9 +133,8 @@ def update_show(id):
 
 
 @app.route('/admin/delete_show/<int:id>/', methods=['POST'])
+@login_required
 def delete_show(id):
-    if not isinstance(session.get('admin', None), bool):
-        abort(403)
     movie = Movie.query.get_or_404(id)
     if deleteShow(movie):
         db.session.delete(movie)
