@@ -18,9 +18,12 @@
                         <h5 class="card-title" style="color: azure; height: 3.5rem;">{{ movie.title }}</h5>
                         <p class="card-text" style="color: #fff;">{{ movie.year }}</p>
                         {% if admin %}
-                            <a href="#" class="btn btn-success">Update</a>
-                        {% else %}
+                            <a href="{{ url_for('update_show', id=movie.id) }}" class="btn btn-success">Update</a>
+                        {% elif movie.category == 'movie' %}
                             <a href="{{ url_for('movie', id=movie.id) }}" class="btn btn-danger"
+                                >Watch Now</a>
+                        {% else %}
+                            <a href="{{ url_for('series', id=movie.id) }}" class="btn btn-danger"
                                 >Watch Now</a>
                         {% endif %}
                     </div>

@@ -1,7 +1,16 @@
-function categoryChange(){
-    var category = document.getElementById("category").value;
+total_episode = 0;
+series_error = false;
 
+function init(){
+    var in_val = document.getElementById("form-script").getAttribute("series-error");
+    if(in_val != "None" && in_val == "True")
+        series_error = true;
+
+    if(document.getElementById("category").value == "series")
+        toggleCategory();
 }
+
+init();
 
 function showhide(){  
     var div = document.getElementById("spinner-div");
@@ -25,14 +34,11 @@ function showhide(){
 function deleteEpisode(e){
     e.parentNode.parentNode.removeChild(e.parentNode);
     total_episode--;
-    console.log(total_episode);
     if(total_episode > 1)
     document.getElementById("movie-label-"+total_episode)
         .insertAdjacentHTML('afterend', '<img id="remove_episode" src="/static/cancel.png"\
         onclick="deleteEpisode(this)" style="cursor: pointer; margin-left: 2rem;"/>');
 }
-
-total_episode = 0;
 
 function toggleAddButton(val){
     document.getElementById("add-episode").style.display = val;
@@ -73,6 +79,9 @@ function addEpisode(){
         html += '<img id="remove_episode" src="/static/cancel.png"\
      onclick="deleteEpisode(this)" style="cursor: pointer; margin-left: 2rem;"/>';
 
-    html += '<input class="form-control-file" id="path" name="path" required="" type="file"></div>';
+    html += '<input class="form-control-file" id="path" name="path" required="" type="file">';
+    if(series_error)
+        html += '<span class="text-danger">File does not have an approved extension: mp4</span><br>';
+    html += '</div>';
     form_group.insertAdjacentHTML('beforebegin', html);
 }

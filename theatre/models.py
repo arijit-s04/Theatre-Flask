@@ -11,6 +11,7 @@ class Movie(db.Model):
     popularity = db.Column(db.Integer, nullable=False, default=0)
     category = db.Column(db.String(20), nullable=False, default='movie')
     description = db.Column(db.Text, nullable=True)
+    number_of_ep = db.Column(db.Integer, nullable=True)
 
     def __repr__(self) -> str:
-        return f"Movie({self.title}, {self.path}, {self.year}, {self.popularity})"
+        return f"Movie({self.id}, {self.title}, {self.path}, {self.year}, {self.category})"

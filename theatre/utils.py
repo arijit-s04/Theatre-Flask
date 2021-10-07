@@ -1,4 +1,7 @@
 import os
+import traceback
+from shutil import rmtree
+from sqlalchemy.sql.expression import true
 from theatre.forms import AdminLoginForm, ShowAddForm
 import ffmpeg
 from theatre import app
@@ -74,6 +77,36 @@ def saveForm(form:ShowAddForm):
     return movie
 
 
+def saveFormSeries(form:ShowAddForm, video_list:list):
+    title = form.title.data
+    path = os.path.join(app.root_path, 'static')
+    poster_file = os.path.join(title.casefold(), form.poster_path.data.filename.casefold())
+    
+    if not os.path.exists(os.path.join(path, title.casefold())):
+        os.mkdir(os.path.join(path, title.casefold()))
+    movie = None
+    try:
+        no_of_ep = len(video_list)
+        for i in range(no_of_ep):
+            video_list[i-1].save(os.path.join(path, title.casefold(), f'Ep_{i+1}.mp4'))
+        
+        form.poster_path.data.save(os.path.join(path, poster_file))
+        description = form.description.data
+        year = form.year.data
+        category = form.category.data
+
+        movie = Movie(title=title, year=year,\
+            category=category, description=description,\
+            path=title.casefold(), poster_path=poster_file, number_of_ep=no_of_ep)
+
+        pass
+    except Exception as e:
+        traceback.print_exc()
+        print(e)
+
+    return movie
+
+
 build_query = lambda x: Movie.title.like('%' + x + '%')
 
 def retrieveKeyWords(query):
@@ -90,3 +123,13 @@ def checkCredentials(form:AdminLoginForm):
     if username != form.username.data:
         return (False, 'Invalid username!')
     return (False, 'Invalid Password!')
+
+def deleteShow(movie:Movie):
+    base_folder = movie.path.split('/')[0]
+    path = os.path.join(app.root_path, 'static', base_folder)
+    try:
+        rmtree(path)
+        return True
+    except Exception as e:
+        traceback.print_exc()
+        return False

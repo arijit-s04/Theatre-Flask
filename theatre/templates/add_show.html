@@ -2,6 +2,7 @@
 {% block content %}
     <div class="px-m">
         <div class="content-section">
+            <div class="d-flex justify-content-center"><span class="h1">Add New Show</span></div>
             <form method="POST" action="" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
                 <fieldset class="form-group">
@@ -91,5 +92,5 @@
             </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='form.js') }}"></script>
+    <script id="form-script" src="{{ url_for('static', filename='form.js') }}" series-error="{{ series_files_check }}"></script>
 {% endblock content %}
